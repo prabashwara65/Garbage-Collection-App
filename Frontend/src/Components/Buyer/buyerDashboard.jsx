@@ -23,7 +23,7 @@ const BuyerDashboard = () => {
   const [snackbarMessage, setSnackbarMessage] = useState(''); // Snackbar message
   const buyer = useSelector((state) => state.user.user);
   const { isLoaded } = useLoadScript({
-    googleMapsApiKey: 'AIzaSyDsDH2Ozs-ReKbNBHAEMsNxRP2Yng2ZUKc',
+    //Google map api is here,
   });
   const mapRef = useRef();
   const mapContainerRef = useRef();
