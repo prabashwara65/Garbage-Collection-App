@@ -54,6 +54,7 @@ const BuyerDashboard = () => {
   const [snackbarMessage, setSnackbarMessage] = useState(""); // Snackbar message
   const buyer = useSelector((state) => state.user.user);
   const { isLoaded } = useLoadScript({
+
     //google map api key
   });
   const mapRef = useRef();

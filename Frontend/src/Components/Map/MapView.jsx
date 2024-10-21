@@ -22,7 +22,8 @@ import { useSelector } from "react-redux";
 
 const MapView = () => {
   const { isLoaded } = useLoadScript({
-    // Replace with your Google Maps API key
+     // Replace with your Google Maps API key
+
   });
 
   const [selectedMarker, setSelectedMarker] = useState(null);
