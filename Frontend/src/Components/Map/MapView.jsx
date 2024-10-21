@@ -54,7 +54,7 @@ const MapView = () => {
             {
               params: {
                 address: loc.address,
-                key: "AIzaSyC0wH-ZaYzuWFEH6n6mhB19bsIZl6bmBmI", // Replace with your Google Maps API key
+                // Replace with your Google Maps API key
               },
             }
           );
