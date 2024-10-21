@@ -1,0 +1,23 @@
+{
+  "dependencies": {
+    "@emotion/react": "^11.13.3",
+    "@emotion/styled": "^11.13.0",
+    "@mui/material": "^6.1.1",
+    "@mui/x-charts": "^7.17.0",
+    "axios": "^1.7.7",
+    "chart.js": "^4.4.4",
+    "dialogflow": "^1.2.0",
+    "ejs": "^3.1.10",
+    "html2canvas": "^1.4.1",
+    "jspdf": "^2.5.2",
+    "leaflet": "^1.9.4",
+    "nodemailer": "^6.9.15",
+    "puppeteer": "^23.4.1",
+    "react-chartjs-2": "^5.2.0",
+    "react-countup": "^6.5.3",
+    "react-leaflet": "^4.2.1",
+    "react-to-print": "^3.0.1",
+    "recharts": "^2.12.7",
+    "tailwind-merge": "^2.5.2"
+  }
+}
