@@ -1,42 +1,75 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { AppBar, Toolbar, Typography, IconButton, Button, Box, Drawer, List, ListItem, ListItemText, Divider, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Dialog, DialogTitle, DialogContent, DialogActions, TextField, Snackbar } from '@mui/material';
-import MenuIcon from '@mui/icons-material/Menu';
-import { GoogleMap, useLoadScript, Marker, InfoWindow, DirectionsRenderer } from '@react-google-maps/api';
-import { useSelector } from 'react-redux';
-import axios from 'axios';
+import React, { useState, useEffect, useRef } from "react";
+import {
+  AppBar,
+  Toolbar,
+  Typography,
+  IconButton,
+  Button,
+  Box,
+  Drawer,
+  List,
+  ListItem,
+  ListItemText,
+  Divider,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  TextField,
+  Snackbar,
+} from "@mui/material";
+import MenuIcon from "@mui/icons-material/Menu";
+import {
+  GoogleMap,
+  useLoadScript,
+  Marker,
+  InfoWindow,
+  DirectionsRenderer,
+} from "@react-google-maps/api";
+import { useSelector } from "react-redux";
+import axios from "axios";
 
 const BuyerDashboard = () => {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [entries, setEntries] = useState([]);
   const [geocodedLocations, setGeocodedLocations] = useState([]);
-  const [selectedPage, setSelectedPage] = useState('Waste Listings');
+  const [selectedPage, setSelectedPage] = useState("Waste Listings");
   const [selectedMarker, setSelectedMarker] = useState(null);
   const [directionsResponse, setDirectionsResponse] = useState(null);
   const [travelTime, setTravelTime] = useState(null);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [pickupData, setPickupData] = useState({
-    pickupDate: '',
-    pickupTime: '',
-    quantity: '',
+    pickupDate: "",
+    pickupTime: "",
+    quantity: "",
   });
   const [snackbarOpen, setSnackbarOpen] = useState(false); // State for the Snackbar
-  const [snackbarMessage, setSnackbarMessage] = useState(''); // Snackbar message
+  const [snackbarMessage, setSnackbarMessage] = useState(""); // Snackbar message
   const buyer = useSelector((state) => state.user.user);
   const { isLoaded } = useLoadScript({
-    //Google map api is here,
+
+    //google map api key
   });
   const mapRef = useRef();
   const mapContainerRef = useRef();
 
   useEffect(() => {
-    if (selectedPage === 'Waste Listings') {
-      axios.get('http://localhost:8000/garbage/allEntries')
+    if (selectedPage === "Waste Listings") {
+      axios
+        .get("http://localhost:8000/garbage/allEntries")
         .then((res) => {
           setEntries(res.data);
           geocodeLocations(res.data);
         })
         .catch((err) => {
-          console.error('Error fetching garbage entries:', err);
+          console.error("Error fetching garbage entries:", err);
         });
     }
   }, [selectedPage]);
@@ -44,12 +77,15 @@ const BuyerDashboard = () => {
   const geocodeLocations = async (locations) => {
     const geocodedData = await Promise.all(
       locations.map(async (loc) => {
-        const { data } = await axios.get(`https://maps.googleapis.com/maps/api/geocode/json`, {
-          params: {
-            address: loc.address,
-            key: 'AIzaSyDsDH2Ozs-ReKbNBHAEMsNxRP2Yng2ZUKc',
-          },
-        });
+        const { data } = await axios.get(
+          `https://maps.googleapis.com/maps/api/geocode/json`,
+          {
+            params: {
+              address: loc.address,
+              key: "AIzaSyDsDH2Ozs-ReKbNBHAEMsNxRP2Yng2ZUKc",
+            },
+          }
+        );
 
         if (data.results.length > 0) {
           const { lat, lng } = data.results[0].geometry.location;
@@ -72,9 +108,9 @@ const BuyerDashboard = () => {
   };
 
   const handleView = (entry) => {
-    const marker = geocodedLocations.find(loc => loc._id === entry._id);
+    const marker = geocodedLocations.find((loc) => loc._id === entry._id);
     setSelectedMarker(marker);
-    mapContainerRef.current.scrollIntoView({ behavior: 'smooth' });
+    mapContainerRef.current.scrollIntoView({ behavior: "smooth" });
 
     setTimeout(() => {
       if (mapRef.current && marker) {
@@ -101,7 +137,7 @@ const BuyerDashboard = () => {
         setTravelTime(result.routes[0].legs[0].duration.text);
       });
     } else {
-      alert('Geolocation is not supported by this browser.');
+      alert("Geolocation is not supported by this browser.");
     }
   };
 
@@ -114,19 +150,22 @@ const BuyerDashboard = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
     try {
-      const response = await axios.post('http://localhost:8000/garbage/scheduleEntry', {
-        ...pickupData,
-        locationId: selectedMarker._id,
-        buyerId: buyer._id,
-      });
-      console.log('Pickup scheduled:', response.data);
-      setSnackbarMessage('Pickup scheduled successfully!'); // Set success message
+      const response = await axios.post(
+        "http://localhost:8000/garbage/scheduleEntry",
+        {
+          ...pickupData,
+          locationId: selectedMarker._id,
+          buyerId: buyer._id,
+        }
+      );
+      console.log("Pickup scheduled:", response.data);
+      setSnackbarMessage("Pickup scheduled successfully!"); // Set success message
       setSnackbarOpen(true); // Open Snackbar
       setDialogOpen(false); // Close the dialog after submission
-      setPickupData({ pickupDate: '', pickupTime: '', quantity: '' }); // Reset form data
+      setPickupData({ pickupDate: "", pickupTime: "", quantity: "" }); // Reset form data
     } catch (error) {
-      console.error('Error scheduling pickup:', error);
-      setSnackbarMessage('Failed to schedule pickup. Please try again.'); // Set error message
+      console.error("Error scheduling pickup:", error);
+      setSnackbarMessage("Failed to schedule pickup. Please try again."); // Set error message
       setSnackbarOpen(true); // Open Snackbar
     }
   };
@@ -137,26 +176,33 @@ const BuyerDashboard = () => {
   };
 
   const renderPageContent = () => {
-    if (selectedPage === 'Waste Listings') {
+    if (selectedPage === "Waste Listings") {
       return (
-        <Box sx={{ padding: '75px' }}>
-          <Typography variant="h5" sx={{ marginBottom: 2, fontWeight: 'bold' }}>
+        <Box sx={{ padding: "75px" }}>
+          <Typography variant="h5" sx={{ marginBottom: 2, fontWeight: "bold" }}>
             Garbage Entries
           </Typography>
           {entries.length === 0 ? (
             <Typography>No garbage entries found.</Typography>
           ) : (
             <>
-              <TableContainer component={Paper} sx={{ maxHeight: 400, overflowY: 'auto', borderRadius: 2 }}>
+              <TableContainer
+                component={Paper}
+                sx={{ maxHeight: 400, overflowY: "auto", borderRadius: 2 }}
+              >
                 <Table stickyHeader>
                   <TableHead>
                     <TableRow>
-                      <TableCell sx={{ fontWeight: 'bold' }}>Name</TableCell>
-                      <TableCell sx={{ fontWeight: 'bold' }}>Address</TableCell>
-                      <TableCell sx={{ fontWeight: 'bold' }}>Quantity</TableCell>
-                      <TableCell sx={{ fontWeight: 'bold' }}>Category</TableCell>
-                      <TableCell sx={{ fontWeight: 'bold' }}>Date</TableCell>
-                      <TableCell sx={{ fontWeight: 'bold' }}>Actions</TableCell>
+                      <TableCell sx={{ fontWeight: "bold" }}>Name</TableCell>
+                      <TableCell sx={{ fontWeight: "bold" }}>Address</TableCell>
+                      <TableCell sx={{ fontWeight: "bold" }}>
+                        Quantity
+                      </TableCell>
+                      <TableCell sx={{ fontWeight: "bold" }}>
+                        Category
+                      </TableCell>
+                      <TableCell sx={{ fontWeight: "bold" }}>Date</TableCell>
+                      <TableCell sx={{ fontWeight: "bold" }}>Actions</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -166,13 +212,15 @@ const BuyerDashboard = () => {
                         <TableCell>{entry.address}</TableCell>
                         <TableCell>{entry.quantity}</TableCell>
                         <TableCell>{entry.category}</TableCell>
-                        <TableCell>{new Date(entry.createdAt).toLocaleDateString()}</TableCell>
+                        <TableCell>
+                          {new Date(entry.createdAt).toLocaleDateString()}
+                        </TableCell>
                         <TableCell>
                           <Button
                             variant="contained"
                             color="primary"
-                            onClick={() => handleView(entry)} 
-                            sx={{ fontSize: '0.875rem', textTransform: 'none' }} 
+                            onClick={() => handleView(entry)}
+                            sx={{ fontSize: "0.875rem", textTransform: "none" }}
                           >
                             View
                           </Button>
@@ -189,7 +237,7 @@ const BuyerDashboard = () => {
                     onLoad={(map) => (mapRef.current = map)}
                     center={{ lat: 7.8731, lng: 80.7718 }}
                     zoom={geocodedLocations.length ? 8 : 8}
-                    mapContainerStyle={{ width: '100%', height: '100%' }}
+                    mapContainerStyle={{ width: "100%", height: "100%" }}
                   >
                     {geocodedLocations.map((loc) => (
                       <Marker
@@ -203,11 +251,19 @@ const BuyerDashboard = () => {
                             onCloseClick={() => setSelectedMarker(null)}
                           >
                             <div>
-                              <Typography variant="body1"><strong>Name:</strong> {loc.name}</Typography>
-                              <Typography variant="body1"><strong>Address:</strong> {loc.address}</Typography>
-                              <Typography variant="body1"><strong>Quantity:</strong> {loc.quantity}</Typography>
-                              <Typography variant="body1"><strong>Category:</strong> {loc.category}</Typography>
-                              
+                              <Typography variant="body1">
+                                <strong>Name:</strong> {loc.name}
+                              </Typography>
+                              <Typography variant="body1">
+                                <strong>Address:</strong> {loc.address}
+                              </Typography>
+                              <Typography variant="body1">
+                                <strong>Quantity:</strong> {loc.quantity}
+                              </Typography>
+                              <Typography variant="body1">
+                                <strong>Category:</strong> {loc.category}
+                              </Typography>
+
                               <Button
                                 variant="contained"
                                 color="secondary"
@@ -247,7 +303,12 @@ const BuyerDashboard = () => {
     <>
       <AppBar position="static" color="default">
         <Toolbar>
-          <IconButton edge="start" color="inherit" aria-label="menu" onClick={handleDrawerToggle}>
+          <IconButton
+            edge="start"
+            color="inherit"
+            aria-label="menu"
+            onClick={handleDrawerToggle}
+          >
             <MenuIcon />
           </IconButton>
           <Typography variant="h6">Buyer Dashboard</Typography>
@@ -255,7 +316,7 @@ const BuyerDashboard = () => {
       </AppBar>
       <Drawer open={drawerOpen} onClose={handleDrawerToggle}>
         <List>
-          {['Waste Listings', 'Settings'].map((text) => (
+          {["Waste Listings", "Settings"].map((text) => (
             <ListItem button key={text} onClick={() => setSelectedPage(text)}>
               <ListItemText primary={text} />
             </ListItem>
@@ -273,7 +334,9 @@ const BuyerDashboard = () => {
               label="Pickup Date"
               type="date"
               value={pickupData.pickupDate}
-              onChange={(e) => setPickupData({ ...pickupData, pickupDate: e.target.value })}
+              onChange={(e) =>
+                setPickupData({ ...pickupData, pickupDate: e.target.value })
+              }
               fullWidth
               margin="normal"
               InputLabelProps={{
@@ -285,7 +348,9 @@ const BuyerDashboard = () => {
               label="Pickup Time"
               type="time"
               value={pickupData.pickupTime}
-              onChange={(e) => setPickupData({ ...pickupData, pickupTime: e.target.value })}
+              onChange={(e) =>
+                setPickupData({ ...pickupData, pickupTime: e.target.value })
+              }
               fullWidth
               margin="normal"
               InputLabelProps={{
@@ -297,14 +362,20 @@ const BuyerDashboard = () => {
               label="Quantity (kg)"
               type="number"
               value={pickupData.quantity}
-              onChange={(e) => setPickupData({ ...pickupData, quantity: e.target.value })}
+              onChange={(e) =>
+                setPickupData({ ...pickupData, quantity: e.target.value })
+              }
               fullWidth
               margin="normal"
               required
             />
             <DialogActions>
-              <Button onClick={() => setDialogOpen(false)} color="primary">Cancel</Button>
-              <Button type="submit" color="primary">Schedule</Button>
+              <Button onClick={() => setDialogOpen(false)} color="primary">
+                Cancel
+              </Button>
+              <Button type="submit" color="primary">
+                Schedule
+              </Button>
             </DialogActions>
           </form>
         </DialogContent>

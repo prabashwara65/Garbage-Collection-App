@@ -1,42 +1,64 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Paper, Typography, Button, TextField, MenuItem, Select, InputLabel, FormControl, Snackbar, Alert } from '@mui/material';
-import { GoogleMap, useLoadScript, Marker, InfoWindow } from '@react-google-maps/api';
-import axios from 'axios';
-import { useSelector } from 'react-redux';
+import React, { useState, useEffect, useRef } from "react";
+import {
+  Paper,
+  Typography,
+  Button,
+  TextField,
+  MenuItem,
+  Select,
+  InputLabel,
+  FormControl,
+  Snackbar,
+  Alert,
+} from "@mui/material";
+import {
+  GoogleMap,
+  useLoadScript,
+  Marker,
+  InfoWindow,
+} from "@react-google-maps/api";
+import axios from "axios";
+import { useSelector } from "react-redux";
 
 const MapView = () => {
   const { isLoaded } = useLoadScript({
      // Replace with your Google Maps API key
+
   });
 
   const [selectedMarker, setSelectedMarker] = useState(null);
   const [geocodedLocations, setGeocodedLocations] = useState([]);
   const mapRef = useRef();
 
-  const [name, setName] = useState('');
-  const [address, setAddress] = useState('');
-  const [quantity, setQuantity] = useState('');
-  const [category, setCategory] = useState('');
+  const [name, setName] = useState("");
+  const [address, setAddress] = useState("");
+  const [quantity, setQuantity] = useState("");
+  const [category, setCategory] = useState("");
   const [openSnackbar, setOpenSnackbar] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState('');
-  const [snackbarSeverity, setSnackbarSeverity] = useState('success'); // 'success', 'error', etc.
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [snackbarSeverity, setSnackbarSeverity] = useState("success"); // 'success', 'error', etc.
   const user = useSelector((state) => state.user.user);
 
   // Fetch saved locations from the backend and geocode them
   const fetchLocations = async () => {
     try {
-      const response = await axios.get('http://localhost:8000/garbage/allEntries');
+      const response = await axios.get(
+        "http://localhost:8000/garbage/allEntries"
+      );
       const locations = response.data;
 
       // Geocode addresses to get latitude and longitude
       const geocodedData = await Promise.all(
         locations.map(async (loc) => {
-          const { data } = await axios.get(`https://maps.googleapis.com/maps/api/geocode/json`, {
-            params: {
-              address: loc.address,
-              key: 'AIzaSyC0wH-ZaYzuWFEH6n6mhB19bsIZl6bmBmI', // Replace with your Google Maps API key
-            },
-          });
+          const { data } = await axios.get(
+            `https://maps.googleapis.com/maps/api/geocode/json`,
+            {
+              params: {
+                address: loc.address,
+                // Replace with your Google Maps API key
+              },
+            }
+          );
 
           if (data.results.length > 0) {
             const { lat, lng } = data.results[0].geometry.location;
@@ -53,7 +75,7 @@ const MapView = () => {
 
       setGeocodedLocations(geocodedData);
     } catch (err) {
-      console.error('Error fetching locations or geocoding:', err);
+      console.error("Error fetching locations or geocoding:", err);
     }
   };
 
@@ -72,27 +94,30 @@ const MapView = () => {
     };
 
     try {
-      await axios.post('http://localhost:8000/garbage/createEntry', entryData);
+      await axios.post("http://localhost:8000/garbage/createEntry", entryData);
 
       // Show success message
-      setSnackbarMessage('Entry added successfully!');
-      setSnackbarSeverity('success');
+      setSnackbarMessage("Entry added successfully!");
+      setSnackbarSeverity("success");
       setOpenSnackbar(true);
 
       // Clear the form
-      setName('');
-      setAddress('');
-      setQuantity('');
-      setCategory('');
+      setName("");
+      setAddress("");
+      setQuantity("");
+      setCategory("");
 
       // Refresh locations to show the new entry on the map
       fetchLocations();
     } catch (err) {
-      console.error('Error submitting entry:', err.response ? err.response.data : err.message);
+      console.error(
+        "Error submitting entry:",
+        err.response ? err.response.data : err.message
+      );
 
       // Show error message
-      setSnackbarMessage('Error adding entry.');
-      setSnackbarSeverity('error');
+      setSnackbarMessage("Error adding entry.");
+      setSnackbarSeverity("error");
       setOpenSnackbar(true);
     }
   };
@@ -102,16 +127,20 @@ const MapView = () => {
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'row' }}>
+    <div style={{ display: "flex", flexDirection: "row" }}>
       {/* Map Section */}
-      <Paper className='m-2' elevation={5} sx={{ width: '50%', height: '100vh' }}>
-        <div style={{ width: '100%', height: '100%' }}>
+      <Paper
+        className="m-2"
+        elevation={5}
+        sx={{ width: "50%", height: "100vh" }}
+      >
+        <div style={{ width: "100%", height: "100%" }}>
           {isLoaded && (
             <GoogleMap
               ref={mapRef}
               center={{ lat: 7.8731, lng: 80.7718 }} // Default to Sri Lanka if no location data
               zoom={geocodedLocations.length ? 8 : 8} // Zoom in if there are saved locations
-              mapContainerStyle={{ width: '100%', height: '100%' }}
+              mapContainerStyle={{ width: "100%", height: "100%" }}
             >
               {/* Display previously saved locations */}
               {geocodedLocations.map((loc) => (
@@ -126,13 +155,27 @@ const MapView = () => {
                       onCloseClick={() => setSelectedMarker(null)}
                     >
                       <div>
-                        <Typography variant="body1"><strong>Name:</strong> {loc.name}</Typography>
-                        <Typography variant="body1"><strong>Email:</strong> {loc.email}</Typography>
-                        <Typography variant="body1"><strong>Address:</strong> {loc.address}</Typography>
-                        <Typography variant="body1"><strong>Latitude:</strong> {loc.latitude}</Typography>
-                        <Typography variant="body1"><strong>Longitude:</strong> {loc.longitude}</Typography>
-                        <Typography variant="body1"><strong>Quantity:</strong> {loc.quantity}</Typography>
-                        <Typography variant="body1"><strong>Category:</strong> {loc.category}</Typography>
+                        <Typography variant="body1">
+                          <strong>Name:</strong> {loc.name}
+                        </Typography>
+                        <Typography variant="body1">
+                          <strong>Email:</strong> {loc.email}
+                        </Typography>
+                        <Typography variant="body1">
+                          <strong>Address:</strong> {loc.address}
+                        </Typography>
+                        <Typography variant="body1">
+                          <strong>Latitude:</strong> {loc.latitude}
+                        </Typography>
+                        <Typography variant="body1">
+                          <strong>Longitude:</strong> {loc.longitude}
+                        </Typography>
+                        <Typography variant="body1">
+                          <strong>Quantity:</strong> {loc.quantity}
+                        </Typography>
+                        <Typography variant="body1">
+                          <strong>Category:</strong> {loc.category}
+                        </Typography>
                       </div>
                     </InfoWindow>
                   )}
@@ -144,7 +187,10 @@ const MapView = () => {
       </Paper>
 
       {/* Form Section */}
-      <Paper elevation={10} sx={{ width: '50%', height: '100vh', padding: '20px', borderRadius: 2 }}>
+      <Paper
+        elevation={10}
+        sx={{ width: "50%", height: "100vh", padding: "20px", borderRadius: 2 }}
+      >
         <Typography variant="h6">Input Details</Typography>
         <TextField
           fullWidth
